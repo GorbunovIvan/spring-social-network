@@ -29,4 +29,11 @@ public class Message {
 
     private String text;
     private LocalDateTime time;
+
+    public Message(User sender, User receiver, String text) {
+        this.sender = sender;
+        this.receiver = receiver;
+        this.text = text;
+        this.time = LocalDateTime.now();
+    }
 }

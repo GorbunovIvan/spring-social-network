@@ -25,4 +25,10 @@ public class Post {
 
     private LocalDateTime text;
     private LocalDateTime time;
+
+    public Post(User user, LocalDateTime text) {
+        this.user = user;
+        this.text = text;
+        this.time = LocalDateTime.now();
+    }
 }

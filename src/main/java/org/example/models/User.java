@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@ToString(of = {"id", "name", "birthDay"})
 @EqualsAndHashCode(of = "id")
 public class User {
 
@@ -41,4 +41,8 @@ public class User {
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
     private List<User> friendsInviters = new ArrayList<>();
 
+    public User(String name, LocalDate birthDay) {
+        this.name = name;
+        this.birthDay = birthDay;
+    }
 }

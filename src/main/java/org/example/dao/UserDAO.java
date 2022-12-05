@@ -1,23 +1,22 @@
 package org.example.dao;
 
+import org.example.models.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Component
-public class User implements DAO<User> {
+public class UserDAO implements DAO<User> {
 
     @Autowired
     private SessionFactory sessionFactory;
 
     @Override
     public void create(User user) {
-        try(Session session = sessionFactory.openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
             session.persist(user);
             session.getTransaction().commit();
@@ -29,7 +28,7 @@ public class User implements DAO<User> {
 
         User user = null;
 
-        try(Session session = sessionFactory.openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
             user = session.get(User.class, id);
             session.getTransaction().commit();
@@ -43,7 +42,7 @@ public class User implements DAO<User> {
 
         List<User> users;
 
-        try(Session session = sessionFactory.openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
             users = session.createQuery("select user from User user", User.class).list();
             session.getTransaction().commit();
