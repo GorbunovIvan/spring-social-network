@@ -36,10 +36,10 @@ public class User {
     private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "inviter", cascade = CascadeType.ALL)
-    private List<User> friendsInvited = new ArrayList<>();
+    private List<FriendsRelations> friendsInvited = new ArrayList<>();
 
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
-    private List<User> friendsInviters = new ArrayList<>();
+    private List<FriendsRelations> friendsInviters = new ArrayList<>();
 
     public User(String name, LocalDate birthDay) {
         this.name = name;

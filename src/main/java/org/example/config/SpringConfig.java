@@ -68,11 +68,11 @@ public class SpringConfig implements WebMvcConfigurer {
         sessionFactoryBean.setPackagesToScan("org.example.models");
         sessionFactoryBean.setHibernateProperties(hibernateProperties());
 
-//        try {
-//            sessionFactoryBean.afterPropertiesSet();
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
+        try {
+            sessionFactoryBean.afterPropertiesSet();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         return sessionFactoryBean.getObject();
     }
