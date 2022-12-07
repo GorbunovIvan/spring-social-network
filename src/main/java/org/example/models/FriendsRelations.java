@@ -14,12 +14,19 @@ import lombok.*;
 public class FriendsRelations {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "inviter_id")
     private User inviter;
 
-    @Id
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "receiver_id")
     private User receiver;
+
+    public FriendsRelations(User inviter, User receiver) {
+        this.inviter = inviter;
+        this.receiver = receiver;
+    }
 }

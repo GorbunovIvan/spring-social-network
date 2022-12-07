@@ -1,5 +1,6 @@
 package org.example.dao;
 
+import org.example.models.Message;
 import org.example.models.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -9,59 +10,64 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class UserDAO implements DAO<User> {
+public class MessageDAO implements DAO<Message> {
 
     @Autowired
     private SessionFactory sessionFactory;
 
     @Override
-    public int create(User user) {
+    public int create(Message message) {
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
-            session.persist(user);
+            session.persist(message);
             session.getTransaction().commit();
         }
-        return user.getId();
+        return message.getId();
     }
 
     @Override
-    public User read(int id) {
+    public Message read(int id) {
 
-        User user;
+        Message message;
 
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
-            user = session.get(User.class, id);
+            message = session.get(Message.class, id);
             session.getTransaction().commit();
         }
 
-        return user;
+        return message;
     }
 
     @Override
-    public List<User> readALl() {
+    public List<Message> readALl() {
 
-        List<User> users;
+        List<Message> messages;
 
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
-            users = session.createQuery("select user from User user", User.class).list();
+            messages = session.createQuery("select message from Message message", Message.class).list();
             session.getTransaction().commit();
         }
 
-        return users;
+        return messages;
     }
 
     @Override
-    public void update(int id, User user) {
+    public void update(int id, Message message) {
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
 
-            User userPersisted = session.get(User.class, id);
-            userPersisted.setName(user.getName());
-            userPersisted.setBirthDay(user.getBirthDay());
+            User sender = session.get(User.class, message.getSender().getId());
+            User receiver = session.get(User.class, message.getReceiver().getId());
 
-            session.persist(userPersisted);
+            Message messagePersisted = session.get(Message.class, id);
+            messagePersisted.setSender(sender);
+            messagePersisted.setReceiver(receiver);
+            messagePersisted.setText(message.getText());
+            messagePersisted.setTime(message.getTime());
+
+            session.persist(messagePersisted);
 
             session.getTransaction().commit();
         }
@@ -71,12 +77,10 @@ public class UserDAO implements DAO<User> {
     public void delete(int id) {
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
-            User user = session.get(User.class, id);
-            if (user != null)
-                session.delete(user);
+            Message message = session.get(Message.class, id);
+            if (message != null)
+                session.delete(message);
             session.getTransaction().commit();
         }
     }
-
-//    public void
 }

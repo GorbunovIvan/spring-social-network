@@ -1,5 +1,6 @@
 package org.example.dao;
 
+import org.example.models.Post;
 import org.example.models.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -9,59 +10,62 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class UserDAO implements DAO<User> {
+public class PostDAO implements DAO<Post> {
 
     @Autowired
     private SessionFactory sessionFactory;
 
     @Override
-    public int create(User user) {
+    public int create(Post post) {
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
-            session.persist(user);
+            session.persist(post);
             session.getTransaction().commit();
         }
-        return user.getId();
+        return post.getId();
     }
 
     @Override
-    public User read(int id) {
+    public Post read(int id) {
 
-        User user;
+        Post post;
 
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
-            user = session.get(User.class, id);
+            post = session.get(Post.class, id);
             session.getTransaction().commit();
         }
 
-        return user;
+        return post;
     }
 
     @Override
-    public List<User> readALl() {
+    public List<Post> readALl() {
 
-        List<User> users;
+        List<Post> posts;
 
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
-            users = session.createQuery("select user from User user", User.class).list();
+            posts = session.createQuery("select post from Post post", Post.class).list();
             session.getTransaction().commit();
         }
 
-        return users;
+        return posts;
     }
 
     @Override
-    public void update(int id, User user) {
+    public void update(int id, Post post) {
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
 
-            User userPersisted = session.get(User.class, id);
-            userPersisted.setName(user.getName());
-            userPersisted.setBirthDay(user.getBirthDay());
+            User user = session.get(User.class, post.getUser().getId());
 
-            session.persist(userPersisted);
+            Post postPersisted = session.get(Post.class, id);
+            postPersisted.setUser(user);
+            postPersisted.setText(post.getText());
+            postPersisted.setTime(post.getTime());
+
+            session.persist(postPersisted);
 
             session.getTransaction().commit();
         }
@@ -71,12 +75,10 @@ public class UserDAO implements DAO<User> {
     public void delete(int id) {
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
-            User user = session.get(User.class, id);
-            if (user != null)
-                session.delete(user);
+            Post post = session.get(Post.class, id);
+            if (post != null)
+                session.delete(post);
             session.getTransaction().commit();
         }
     }
-
-//    public void
 }

@@ -4,9 +4,9 @@ import java.util.List;
 
 public interface DAO<Model> {
 
-    void create(Model model);
+    int create(Model model);
     Model read(int id);
     List<Model> readALl();
-    void update(Model model);
-    void delete(Model model);
+    void update(int id, Model model);
+    void delete(int id);
 }
