@@ -2,10 +2,7 @@ package org.example.config;
 
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 import org.hibernate.SessionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -26,42 +23,42 @@ import java.util.Properties;
 
 @Configuration
 @ComponentScan("org.example")
-//@EnableWebMvc
+@EnableWebMvc
 public class SpringConfig implements WebMvcConfigurer {
 
-//    private final ApplicationContext applicationContext;
-//
-//    @Autowired
-//    public SpringConfig(ApplicationContext applicationContext) {
-//        this.applicationContext = applicationContext;
-//    }
-//
-//    @Bean
-//    public SpringResourceTemplateResolver templateResolver() {
-//
-//        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
-//        templateResolver.setApplicationContext(applicationContext);
-//        templateResolver.setPrefix("/WEB-INF/views/");
-//        templateResolver.setSuffix(".html");
-//
-//        return templateResolver;
-//    }
-//
-//    @Bean
-//    public SpringTemplateEngine templateEngine() {
-//
-//        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-//        templateEngine.setTemplateResolver(templateResolver());
-//        templateEngine.setEnableSpringELCompiler(true);
-//
-//        return templateEngine;
-//    }
-//
-//    public void configureViewResolvers(ViewResolverRegistry registry) {
-//        ThymeleafViewResolver resolver = new ThymeleafViewResolver();
-//        resolver.setTemplateEngine(templateEngine());
-//        registry.viewResolver(resolver);
-//    }
+    private final ApplicationContext applicationContext;
+
+    @Autowired
+    public SpringConfig(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
+    @Bean
+    public SpringResourceTemplateResolver templateResolver() {
+
+        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
+        templateResolver.setApplicationContext(applicationContext);
+        templateResolver.setPrefix("/WEB-INF/views/");
+        templateResolver.setSuffix(".html");
+
+        return templateResolver;
+    }
+
+    @Bean
+    public SpringTemplateEngine templateEngine() {
+
+        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver());
+        templateEngine.setEnableSpringELCompiler(true);
+
+        return templateEngine;
+    }
+
+    public void configureViewResolvers(ViewResolverRegistry registry) {
+        ThymeleafViewResolver resolver = new ThymeleafViewResolver();
+        resolver.setTemplateEngine(templateEngine());
+        registry.viewResolver(resolver);
+    }
 
     @Bean
     public SessionFactory sessionFactory() {
