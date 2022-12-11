@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode(of = "id")
-public class Message {
+public class Message implements Comparable<Message> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,5 +35,10 @@ public class Message {
         this.receiver = receiver;
         this.text = text;
         this.time = LocalDateTime.now();
+    }
+
+    @Override
+    public int compareTo(Message o) {
+        return getTime().compareTo(o.getTime());
     }
 }

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'friends of ' + ${user.getName()}"/>
+</head>
+<body>
+
+    Friends:</br></br>
+
+    <div th:each="friend : ${friends}">
+        <a th:href="@{/users/{id}(id=${friend.getId()})}" th:text="${friend.getName()}"/>
+    </div>
+
+</body>
+</html>

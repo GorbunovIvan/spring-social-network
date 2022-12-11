@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'user - ' + ${user.getName()}"/>
+</head>
+<body>
+
+    <p th:text="'Name: ' + ${user.getName()}"/>
+    <p th:text="'Birth day: ' + ${user.getBirthDay()}"/>
+    <a th:href="@{/users/{id}/edit(id=${user.getId()})}">edit</a>
+
+    <hr/>
+
+    <a th:href="@{/users/{id}/friends(id=${user.getId()})}">friends</a>
+
+    <hr/>
+
+    Posts:
+    </br>
+    <a href="/posts/new">new</a>
+    <div th:each="post : ${posts}">
+        <p th:text="@{{time} - {text}(time=${post.getTime()}, text=${post.getText()})}"/>
+        <a th:href="@{/posts/{id}(id=${post.getId()})}">edit</a>
+        <a th:href="@{/users/{id}/delete(id=${post.getId()})}">delete</a>
+        </br>
+    </div>
+
+</body>
+</html>

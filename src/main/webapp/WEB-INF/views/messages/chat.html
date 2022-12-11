@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'chat with ' + ${companion.getName()}" />
+</head>
+<body>
+
+    chat with <a th:href="@{/users/{id}(id=${companion.getId()})}" th:text="${companion.getName()}" /></br>
+    <a th:href="@{/users/{id}(id=${user.getId()})}">back to profile</a>
+
+    <hr/>
+
+    <div th:each="message : ${messages}">
+        <p th:text="${message.getSender().getName()} + ' - (' + ${message.getTime()} + ') ' + ${message.getText()}">
+    </div>
+
+</body>
+</html>

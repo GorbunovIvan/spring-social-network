@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -44,6 +45,23 @@ public class User {
     public User(String name, LocalDate birthDay) {
         this.name = name;
         this.birthDay = birthDay;
+    }
+
+    public List<User> getFriends() {
+
+        List<User> friends = new ArrayList<>();
+
+        // those who invited this user
+        friends.addAll(friendsInviters.stream()
+                                .map(FriendsRelations::getInviter)
+                                .toList());
+
+        // those who were invited by this user
+        friends.addAll(friendsInvited.stream()
+                                .map(FriendsRelations::getReceiver)
+                                .toList());
+
+        return friends;
     }
 
     public void sendMessage(User receiver, String text) {
