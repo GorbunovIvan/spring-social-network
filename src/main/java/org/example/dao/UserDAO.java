@@ -11,8 +11,11 @@ import java.util.List;
 @Component
 public class UserDAO implements DAO<User> {
 
-    @Autowired
-    private SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
+
+    public UserDAO(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     @Override
     public int create(User user) {
@@ -78,5 +81,8 @@ public class UserDAO implements DAO<User> {
         }
     }
 
-//    public void
+    // temporary
+    public User getCurrentUser() {
+        return read(52);
+    }
 }

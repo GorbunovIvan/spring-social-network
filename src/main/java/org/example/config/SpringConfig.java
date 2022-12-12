@@ -1,9 +1,12 @@
 package org.example.config;
 
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
+import org.example.dao.UserDAO;
+import org.example.models.User;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

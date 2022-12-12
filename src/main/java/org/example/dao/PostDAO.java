@@ -15,13 +15,22 @@ public class PostDAO implements DAO<Post> {
     @Autowired
     private SessionFactory sessionFactory;
 
+    @Autowired
+    private UserDAO userDAO;
+
     @Override
     public int create(Post post) {
+
+        if (post.getUser() == null)
+            post.setUser(userDAO.getCurrentUser());
+
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
+            post.setUser(session.get(User.class, post.getUser().getId()));
             session.persist(post);
             session.getTransaction().commit();
         }
+
         return post.getId();
     }
 

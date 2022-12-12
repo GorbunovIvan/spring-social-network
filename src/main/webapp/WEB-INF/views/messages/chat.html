@@ -15,5 +15,10 @@
         <p th:text="${message.getSender().getName()} + ' - (' + ${message.getTime()} + ') ' + ${message.getText()}">
     </div>
 
+    <form th:method="POST" th:action="@{/chat/createNew/{/id}(id=${companion.getId()})}" th:object="${message}">
+        <input type="text" th:field="*{text}" id="text">
+        <input type="submit" value="submit">
+    </form>
+
 </body>
 </html>

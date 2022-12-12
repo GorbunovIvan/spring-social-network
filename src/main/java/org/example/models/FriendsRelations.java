@@ -17,11 +17,11 @@ public class FriendsRelations {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REFRESH })
     @JoinColumn(name = "inviter_id")
     private User inviter;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REFRESH })
     @JoinColumn(name = "receiver_id")
     private User receiver;
 

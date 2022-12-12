@@ -3,6 +3,7 @@ package org.example.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,11 +20,11 @@ public class Message implements Comparable<Message> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REFRESH })
     @JoinColumn(name = "sender_id")
     private User sender;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REFRESH })
     @JoinColumn(name = "receiver_id")
     private User receiver;
 

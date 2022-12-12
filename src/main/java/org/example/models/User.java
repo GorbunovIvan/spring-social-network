@@ -27,19 +27,19 @@ public class User {
     @Column(name = "birth_day")
     private LocalDate birthDay;
 
-    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "sender", cascade = { CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER)
     private List<Message> messagesSent = new ArrayList<>();
 
-    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "receiver", cascade = { CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER)
     private List<Message> messagesReceived = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = { CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER)
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "inviter", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "inviter", cascade = { CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER)
     private List<FriendsRelations> friendsInvited = new ArrayList<>();
 
-    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "receiver", cascade = { CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER)
     private List<FriendsRelations> friendsInviters = new ArrayList<>();
 
     public User(String name, LocalDate birthDay) {
@@ -74,8 +74,9 @@ public class User {
         posts.add(post);
     }
 
-    public void addFriend(User friend) {
+    public FriendsRelations addFriend(User friend) {
         FriendsRelations friendsRelations = new FriendsRelations(this, friend);
         friendsInvited.add(friendsRelations);
+        return friendsRelations;
     }
 }

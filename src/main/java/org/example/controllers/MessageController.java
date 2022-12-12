@@ -7,14 +7,12 @@ import org.example.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Controller
-@RequestMapping("/messages")
+@RequestMapping("/chat")
 public class MessageController {
 
     @Autowired
@@ -22,10 +20,10 @@ public class MessageController {
     @Autowired
     private MessageDAO messageDAO;
 
-    @GetMapping("/{userId}/{companionId}")
-    public String chat(@PathVariable int userId, @PathVariable int companionId, Model model) {
+    @GetMapping("/{companionId}")
+    public String chat(@PathVariable int companionId, Model model) {
 
-        User user = userDAO.read(userId);
+        User user = userDAO.getCurrentUser();
         User companion = userDAO.read(companionId);
 
         List<Message> messages = messageDAO.getMessagesOfChat(user, companion);
@@ -33,8 +31,23 @@ public class MessageController {
         model.addAttribute("user", user);
         model.addAttribute("companion", companion);
         model.addAttribute("messages", messages);
+        model.addAttribute("message", new Message(user, companion, ""));
 
         return "/messages/chat";
+    }
+
+    @PostMapping("/createNew/{id}")
+    public String createNew(@PathVariable("id") int receiverId, @ModelAttribute Message message) {
+
+        User sender = userDAO.getCurrentUser();
+        User receiver = userDAO.read(receiverId);
+
+        message.setSender(sender);
+        message.setReceiver(receiver);
+
+        messageDAO.create(message);
+
+        return "redirect:/chat/" + receiver.getId();
     }
 
 }

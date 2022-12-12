@@ -19,7 +19,7 @@ public class Post implements Comparable<Post> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REFRESH })
     @JoinColumn(name = "user_id")
     private User user;
 

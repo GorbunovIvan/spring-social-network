@@ -1,5 +1,6 @@
 package org.example.dao;
 
+import jakarta.persistence.Query;
 import org.example.models.FriendsRelations;
 import org.example.models.User;
 import org.hibernate.Session;
@@ -17,12 +18,22 @@ public class FriendsRelationsDAO implements DAO<FriendsRelations> {
 
     @Override
     public int create(FriendsRelations friendsRelations) {
+
+        FriendsRelations friendsRelationsPersisted;
+
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
-            session.persist(friendsRelations);
+
+            User user = session.get(User.class, friendsRelations.getInviter().getId());
+            User friend = session.get(User.class, friendsRelations.getReceiver().getId());
+            friendsRelationsPersisted = new FriendsRelations(user, friend);
+
+            session.persist(friendsRelationsPersisted);
+
             session.getTransaction().commit();
         }
-        return friendsRelations.getId();
+
+        return friendsRelationsPersisted.getId();
     }
 
     @Override
@@ -32,8 +43,29 @@ public class FriendsRelationsDAO implements DAO<FriendsRelations> {
 
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
-            friendsRelations =  session.get(FriendsRelations.class, id);
+            friendsRelations = session.get(FriendsRelations.class, id);
             session.getTransaction().commit();
+        }
+
+        return friendsRelations;
+    }
+
+    public FriendsRelations read(int friend1Id, int friend2Id) {
+
+        FriendsRelations friendsRelations;
+
+        try (Session session = sessionFactory.openSession()) {
+
+            session.getTransaction().begin();
+
+            Query query = session.createNativeQuery("select * from friends_relations f WHERE (f.inviter_id = ?1 AND f.receiver_id = ?2) OR (f.inviter_id = ?2 AND f.receiver_id = ?1)", FriendsRelations.class);
+            query.setParameter(1, friend1Id);
+            query.setParameter(2, friend2Id);
+
+            friendsRelations = (FriendsRelations)query.getSingleResult();
+
+            session.getTransaction().commit();
+
         }
 
         return friendsRelations;

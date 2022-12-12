@@ -21,12 +21,22 @@ public class MessageDAO implements DAO<Message> {
 
     @Override
     public int create(Message message) {
+
+        Message messagePersisted;
+
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
-            session.persist(message);
+
+            User sender = session.get(User.class, message.getSender().getId());
+            User receiver = session.get(User.class, message.getReceiver().getId());
+
+            messagePersisted = new Message(sender, receiver, message.getText());
+            session.persist(messagePersisted);
+
             session.getTransaction().commit();
         }
-        return message.getId();
+
+        return messagePersisted.getId();
     }
 
     @Override

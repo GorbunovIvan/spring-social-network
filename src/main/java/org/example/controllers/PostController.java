@@ -1,6 +1,7 @@
 package org.example.controllers;
 
 import org.example.dao.PostDAO;
+import org.example.dao.UserDAO;
 import org.example.models.Post;
 import org.example.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,15 +15,12 @@ public class PostController {
 
     @Autowired
     private PostDAO postDAO;
+    @Autowired
+    private UserDAO userDAO;
 
     @GetMapping("/new")
     public String createNew(Model model) {
-
-        Post post = new Post();
-        post.setUser((User)model.getAttribute("user"));
-
-        model.addAttribute("post", post);
-
+        model.addAttribute("post", new Post());
         return "posts/post";
     }
 
@@ -33,7 +31,9 @@ public class PostController {
     }
 
     @PostMapping
-    public String update(@ModelAttribute Post post) {
+    public String createUpdate(@ModelAttribute Post post) {
+
+        post.setUser(userDAO.getCurrentUser());
 
         if (post.getId() == null)
             postDAO.create(post);
