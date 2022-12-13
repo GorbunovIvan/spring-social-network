@@ -20,18 +20,22 @@ public class PostController {
 
     @GetMapping("/new")
     public String createNew(Model model) {
+        userDAO.checkIfAuthorized();
         model.addAttribute("post", new Post());
         return "posts/post";
     }
 
     @GetMapping("/{id}")
     public String edit(@PathVariable int id, Model model) {
+        userDAO.checkIfAuthorized();
         model.addAttribute("post", postDAO.read(id));
         return "posts/post";
     }
 
     @PostMapping
     public String createUpdate(@ModelAttribute Post post) {
+
+        userDAO.checkIfAuthorized();
 
         post.setUser(userDAO.getCurrentUser());
 
@@ -45,6 +49,8 @@ public class PostController {
 
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable int id) {
+
+        userDAO.checkIfAuthorized();
 
         Post post = postDAO.read(id);
 

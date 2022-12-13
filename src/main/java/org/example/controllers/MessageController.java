@@ -23,6 +23,8 @@ public class MessageController {
     @GetMapping("/{companionId}")
     public String chat(@PathVariable int companionId, Model model) {
 
+        userDAO.checkIfAuthorized();
+
         User user = userDAO.getCurrentUser();
         User companion = userDAO.read(companionId);
 
@@ -38,6 +40,8 @@ public class MessageController {
 
     @PostMapping("/createNew/{id}")
     public String createNew(@PathVariable("id") int receiverId, @ModelAttribute Message message) {
+
+        userDAO.checkIfAuthorized();
 
         User sender = userDAO.getCurrentUser();
         User receiver = userDAO.read(receiverId);

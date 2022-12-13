@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Table(name = "posts")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode(of = "id")
@@ -25,6 +24,10 @@ public class Post implements Comparable<Post> {
 
     private String text;
     private LocalDateTime time;
+
+    public Post() {
+        this.time = LocalDateTime.now();
+    }
 
     public Post(User user, String text) {
         this.user = user;

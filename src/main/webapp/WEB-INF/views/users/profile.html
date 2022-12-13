@@ -8,9 +8,12 @@
 
     <p th:text="'Name: ' + ${user.getName()}"/>
     <p th:text="'Birth day: ' + ${user.getBirthDay()}"/>
-    <a th:href="@{/users/edit}">edit</a></br>
-    <a th:href="@{/users/addToFriends/{id}(id=${user.getId()})}">add to friends</a>
-    <a th:href="@{/users/deleteFromFriends/{id}(id=${user.getId()})}">delete from friends</a>
+
+    <div th:if = "${isCurrentUser}">
+        <a th:href="@{/users/edit}">edit</a></br>
+        <a th:href="@{/users/addToFriends/{id}(id=${user.getId()})}">add to friends</a>
+        <a th:href="@{/users/deleteFromFriends/{id}(id=${user.getId()})}">delete from friends</a>
+    </div>
 
     <hr/>
 
@@ -20,12 +23,16 @@
 
     Posts:
     </br>
-    <a href="/posts/new">new</a>
+    <div th:if = "${isCurrentUser}">
+        <a href="/posts/new">new</a>
+    </div>
     <div th:each="post : ${posts}">
         <p th:text="@{{time} - {text}(time=${post.getTime()}, text=${post.getText()})}"/>
-        <a th:href="@{/posts/{id}(id=${post.getId()})}">edit</a>
-        <a th:href="@{/posts/delete/{id}(id=${post.getId()})}">delete</a>
-        </br>
+        <div th:if = "${isCurrentUser}">
+            <a th:href="@{/posts/{id}(id=${post.getId()})}">edit</a>
+            <a th:href="@{/posts/delete/{id}(id=${post.getId()})}">delete</a>
+            </br>
+        </div>
     </div>
 
 </body>

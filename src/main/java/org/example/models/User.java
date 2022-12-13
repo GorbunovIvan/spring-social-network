@@ -27,6 +27,9 @@ public class User {
     @Column(name = "birth_day")
     private LocalDate birthDay;
 
+    private String login;
+    private String password;
+
     @OneToMany(mappedBy = "sender", cascade = { CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER)
     private List<Message> messagesSent = new ArrayList<>();
 

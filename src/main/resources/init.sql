@@ -1,6 +1,8 @@
 CREATE TABLE IF NOT EXISTS users(
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
+    login VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(50) NOT NULL,
     birth_day DATE
 );
 

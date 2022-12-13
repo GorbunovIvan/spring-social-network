@@ -31,6 +31,7 @@ public class UserController {
         User user = userDAO.read(id);
 
         model.addAttribute("user", user);
+        model.addAttribute("isCurrentUser", user.equals(userDAO.getCurrentUser()));
         model.addAttribute("posts", user.getPosts());
 
         return "users/profile";
@@ -49,18 +50,22 @@ public class UserController {
 
     @GetMapping("/edit")
     public String edit(Model model) {
+        userDAO.checkIfAuthorized();
         model.addAttribute("user", userDAO.getCurrentUser());
         return "/users/edit";
     }
 
     @PostMapping("/update")
     public String update(@ModelAttribute User user) {
+        userDAO.checkIfAuthorized();
         userDAO.update(user.getId(), user);
         return "redirect:/users/" + user.getId();
     }
 
     @GetMapping("/addToFriends/{id}")
     public String addToFriends(@PathVariable int id) {
+
+        userDAO.checkIfAuthorized();
 
         User user = userDAO.getCurrentUser();
         User friend = userDAO.read(id);
@@ -82,6 +87,8 @@ public class UserController {
 
     @GetMapping("/deleteFromFriends/{id}")
     public String deleteFromFriends(@PathVariable int id) {
+
+        userDAO.checkIfAuthorized();
 
         User friend = userDAO.read(id);
         User user = userDAO.getCurrentUser();

@@ -3,7 +3,7 @@ package org.example.dao;
 import org.example.models.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,8 +13,11 @@ public class UserDAO implements DAO<User> {
 
     private final SessionFactory sessionFactory;
 
+    private User currentUser;
+
     public UserDAO(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+//        currentUser = read(52);
     }
 
     @Override
@@ -33,9 +36,28 @@ public class UserDAO implements DAO<User> {
         User user;
 
         try (Session session = sessionFactory.openSession()) {
-            session.getTransaction().begin();
             user = session.get(User.class, id);
-            session.getTransaction().commit();
+        }
+
+        return user;
+    }
+
+    public User read(String login, String password) {
+
+        User user;
+
+        try (Session session = sessionFactory.openSession()) {
+
+            Query<User> query = session.createQuery("select u from User u where login=?1 and password=?2", User.class);
+            query.setParameter(1, login);
+            query.setParameter(2, password);
+
+            List<User> users = query.getResultList();
+
+            if (users.isEmpty())
+                return null;
+
+            user = users.get(0);
         }
 
         return user;
@@ -47,9 +69,7 @@ public class UserDAO implements DAO<User> {
         List<User> users;
 
         try (Session session = sessionFactory.openSession()) {
-            session.getTransaction().begin();
             users = session.createQuery("select user from User user", User.class).list();
-            session.getTransaction().commit();
         }
 
         return users;
@@ -81,8 +101,25 @@ public class UserDAO implements DAO<User> {
         }
     }
 
-    // temporary
-    public User getCurrentUser() {
-        return read(52);
+    public boolean isLoginFree(String login) {
+        try(Session session = sessionFactory.openSession()) {
+            Query<Integer> query = session.createNativeQuery("select 1 from users u where u.login=?1", Integer.class);
+            query.setParameter(1, login);
+            return query.getResultList().isEmpty();
+        }
     }
+
+    public void checkIfAuthorized() {
+        if (getCurrentUser() == null)
+            throw new IllegalStateException("you are not authorized");
+    }
+
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(User user) {
+        currentUser = user;
+    }
+
 }
