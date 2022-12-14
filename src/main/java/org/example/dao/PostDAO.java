@@ -21,8 +21,8 @@ public class PostDAO implements DAO<Post> {
     @Override
     public int create(Post post) {
 
-        if (post.getUser() == null)
-            post.setUser(userDAO.getCurrentUser());
+//        if (post.getUser() == null)
+//            post.setUser(userDAO.getCurrentUser());
 
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();

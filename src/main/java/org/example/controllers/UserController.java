@@ -1,6 +1,7 @@
 package org.example.controllers;
 
-import org.example.config.SpringConfig;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.example.dao.FriendsRelationsDAO;
 import org.example.dao.UserDAO;
 import org.example.models.FriendsRelations;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
 
 @Controller
 @RequestMapping("/users")
@@ -19,19 +22,30 @@ public class UserController {
     @Autowired
     private FriendsRelationsDAO friendsRelationsDAO;
 
-    @GetMapping()
-    public String showAll(Model model) {
+    @GetMapping
+    public String showAll(Model model,
+                          @CookieValue(value = "user-id", defaultValue = "") String currentUserId) {
+
+        User currentUser = userDAO.getCurrentUser(currentUserId);
+
         model.addAttribute("users", userDAO.readALl());
+        model.addAttribute("user", currentUser);
+        model.addAttribute("isAuthorized", currentUser != null);
+
         return "users/all";
     }
 
     @GetMapping("/{id}")
-    public String profile(@PathVariable int id, Model model) {
+    public String profile(@PathVariable int id, Model model,
+            @CookieValue(value = "user-id", defaultValue = "") String currentUserId) {
 
         User user = userDAO.read(id);
+        User currentUser = userDAO.getCurrentUser(currentUserId);
 
         model.addAttribute("user", user);
-        model.addAttribute("isCurrentUser", user.equals(userDAO.getCurrentUser()));
+        model.addAttribute("isAuthorized", currentUser != null);
+        model.addAttribute("isCurrentUser", user.equals(currentUser));
+        model.addAttribute("isFriend", user.getFriends().contains(currentUser));
         model.addAttribute("posts", user.getPosts());
 
         return "users/profile";
@@ -49,25 +63,35 @@ public class UserController {
     }
 
     @GetMapping("/edit")
-    public String edit(Model model) {
-        userDAO.checkIfAuthorized();
-        model.addAttribute("user", userDAO.getCurrentUser());
+    public String edit(Model model,
+                       @CookieValue(value = "user-id", defaultValue = "") String currentUserId) {
+
+        if (!userDAO.isAuthorized(currentUserId))
+            return "redirect:/auth/login";
+
+        model.addAttribute("user", userDAO.getCurrentUser(currentUserId));
         return "/users/edit";
     }
 
     @PostMapping("/update")
-    public String update(@ModelAttribute User user) {
-        userDAO.checkIfAuthorized();
+    public String update(@ModelAttribute User user,
+                         @CookieValue(value = "user-id", defaultValue = "") String currentUserId) {
+
+        if (!userDAO.isAuthorized(currentUserId))
+            return "redirect:/auth/login";
+
         userDAO.update(user.getId(), user);
         return "redirect:/users/" + user.getId();
     }
 
     @GetMapping("/addToFriends/{id}")
-    public String addToFriends(@PathVariable int id) {
+    public String addToFriends(@PathVariable int id,
+                               @CookieValue(value = "user-id", defaultValue = "") String currentUserId) {
 
-        userDAO.checkIfAuthorized();
+        if (!userDAO.isAuthorized(currentUserId))
+            return "redirect:/auth/login";
 
-        User user = userDAO.getCurrentUser();
+        User user = userDAO.getCurrentUser(currentUserId);
         User friend = userDAO.read(id);
 
         if (friend.equals(user))
@@ -86,17 +110,19 @@ public class UserController {
     }
 
     @GetMapping("/deleteFromFriends/{id}")
-    public String deleteFromFriends(@PathVariable int id) {
+    public String deleteFromFriends(@PathVariable int id,
+                                    @CookieValue(value = "user-id", defaultValue = "") String currentUserId) {
 
-        userDAO.checkIfAuthorized();
+        if (!userDAO.isAuthorized(currentUserId))
+            return "redirect:/auth/login";
 
         User friend = userDAO.read(id);
-        User user = userDAO.getCurrentUser();
+        User user = userDAO.getCurrentUser(currentUserId);
 
         if (friend.equals(user))
             throw new IllegalArgumentException("you cannot delete yourself from friends");
 
-        if (!user.getFriends().contains(friend))
+        if (!friend.getFriends().contains(user))
             throw new IllegalArgumentException("it's not your friend");
 
         FriendsRelations friendsRelations = friendsRelationsDAO.read(user.getId(), friend.getId());

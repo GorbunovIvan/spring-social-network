@@ -21,11 +21,13 @@ public class MessageController {
     private MessageDAO messageDAO;
 
     @GetMapping("/{companionId}")
-    public String chat(@PathVariable int companionId, Model model) {
+    public String chat(@PathVariable int companionId, Model model,
+                       @CookieValue(value = "user-id", defaultValue = "") String currentUserId) {
 
-        userDAO.checkIfAuthorized();
+        if (!userDAO.isAuthorized(currentUserId))
+            return "redirect:/auth/login";
 
-        User user = userDAO.getCurrentUser();
+        User user = userDAO.getCurrentUser(currentUserId);
         User companion = userDAO.read(companionId);
 
         List<Message> messages = messageDAO.getMessagesOfChat(user, companion);
@@ -39,11 +41,13 @@ public class MessageController {
     }
 
     @PostMapping("/createNew/{id}")
-    public String createNew(@PathVariable("id") int receiverId, @ModelAttribute Message message) {
+    public String createNew(@PathVariable("id") int receiverId, @ModelAttribute Message message,
+                            @CookieValue(value = "user-id", defaultValue = "") String currentUserId) {
 
-        userDAO.checkIfAuthorized();
+        if (!userDAO.isAuthorized(currentUserId))
+            return "redirect:/auth/login";
 
-        User sender = userDAO.getCurrentUser();
+        User sender = userDAO.getCurrentUser(currentUserId);
         User receiver = userDAO.read(receiverId);
 
         message.setSender(sender);

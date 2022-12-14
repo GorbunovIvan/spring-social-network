@@ -7,13 +7,12 @@ import org.hibernate.query.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class UserDAO implements DAO<User> {
 
     private final SessionFactory sessionFactory;
-
-    private User currentUser;
 
     public UserDAO(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
@@ -109,17 +108,23 @@ public class UserDAO implements DAO<User> {
         }
     }
 
-    public void checkIfAuthorized() {
-        if (getCurrentUser() == null)
+    public void stopIfNotAuthorized(String userIdFromCookies) {
+        if (!isAuthorized(userIdFromCookies))
             throw new IllegalStateException("you are not authorized");
     }
 
-    public User getCurrentUser() {
-        return currentUser;
+    public boolean isAuthorized(String userIdFromCookies) {
+        return getCurrentUser(userIdFromCookies) != null;
     }
 
-    public void setCurrentUser(User user) {
-        currentUser = user;
+    public User getCurrentUser(String userIdFromCookies) {
+
+        if (userIdFromCookies.isEmpty())
+            return null;
+
+        User user = read(Integer.parseInt(userIdFromCookies));
+
+        return user;
     }
 
 }

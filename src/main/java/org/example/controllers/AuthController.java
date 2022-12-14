@@ -1,5 +1,7 @@
 package org.example.controllers;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.example.dao.UserDAO;
 import org.example.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +23,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@ModelAttribute("user") User userForAuthentication) {
+    public String login(@ModelAttribute("user") User userForAuthentication, HttpServletResponse response) {
 
         User user = userDAO.read(userForAuthentication.getLogin(), userForAuthentication.getPassword());
 
         if (user == null)
             return "redirect:/auth/login";
 
-        userDAO.setCurrentUser(user);
+        setCurrentUser(user, response);
 
         return "redirect:/users";
     }
@@ -40,7 +42,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@ModelAttribute User user) {
+    public String register(@ModelAttribute User user, HttpServletResponse response) {
 
         if ((user.getLogin() == null || user.getLogin().isBlank())
             || (user.getName() == null || user.getName().isBlank())
@@ -51,9 +53,31 @@ public class AuthController {
             throw new IllegalArgumentException("login is reserved");
 
         userDAO.create(user);
-        userDAO.setCurrentUser(user);
+
+        setCurrentUser(user, response);
 
         return "redirect:/users/edit";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletResponse response) {
+        setCurrentUser(null, response);
+        return "redirect:/users";
+    }
+
+    private void setCurrentUser(User user, HttpServletResponse response) {
+
+        String userId = "";
+
+        if (user != null)
+            userId = String.valueOf(user.getId());
+
+        Cookie cookie = new Cookie("user-id", userId);
+        cookie.setMaxAge(30 * 60);
+        cookie.setPath("/");
+
+        response.addCookie(cookie);
+
     }
 
 }

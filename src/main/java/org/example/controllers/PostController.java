@@ -3,7 +3,6 @@ package org.example.controllers;
 import org.example.dao.PostDAO;
 import org.example.dao.UserDAO;
 import org.example.models.Post;
-import org.example.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,25 +18,35 @@ public class PostController {
     private UserDAO userDAO;
 
     @GetMapping("/new")
-    public String createNew(Model model) {
-        userDAO.checkIfAuthorized();
+    public String createNew(Model model,
+                            @CookieValue(value = "user-id", defaultValue = "") String currentUserId) {
+
+        if (!userDAO.isAuthorized(currentUserId))
+            return "redirect:/auth/login";
+
         model.addAttribute("post", new Post());
         return "posts/post";
     }
 
     @GetMapping("/{id}")
-    public String edit(@PathVariable int id, Model model) {
-        userDAO.checkIfAuthorized();
+    public String edit(@PathVariable int id, Model model,
+                       @CookieValue(value = "user-id", defaultValue = "") String currentUserId) {
+
+        if (!userDAO.isAuthorized(currentUserId))
+            return "redirect:/auth/login";
+
         model.addAttribute("post", postDAO.read(id));
         return "posts/post";
     }
 
     @PostMapping
-    public String createUpdate(@ModelAttribute Post post) {
+    public String createUpdate(@ModelAttribute Post post,
+                               @CookieValue(value = "user-id", defaultValue = "") String currentUserId) {
 
-        userDAO.checkIfAuthorized();
+        if (!userDAO.isAuthorized(currentUserId))
+            return "redirect:/auth/login";
 
-        post.setUser(userDAO.getCurrentUser());
+        post.setUser(userDAO.getCurrentUser(currentUserId));
 
         if (post.getId() == null)
             postDAO.create(post);
@@ -48,9 +57,11 @@ public class PostController {
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable int id) {
+    public String delete(@PathVariable int id,
+                         @CookieValue(value = "user-id", defaultValue = "") String currentUserId) {
 
-        userDAO.checkIfAuthorized();
+        if (!userDAO.isAuthorized(currentUserId))
+            return "redirect:/auth/login";
 
         Post post = postDAO.read(id);
 

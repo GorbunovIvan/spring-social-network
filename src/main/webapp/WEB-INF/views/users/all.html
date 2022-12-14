@@ -6,8 +6,14 @@
 </head>
 <body>
 
-    <a href="/auth/login">login</a><br>
-    <a href="/auth/register">register</a>
+    <div th:if="${isAuthorized}">
+        Hello, <a th:href="@{/users/{id}(id=${user.getId()})}" th:text="${user.getName()}"/><br>
+        <a href="/auth/logout">logout</a>
+    </div>
+    <div th:unless="${isAuthorized}">
+        <a href="/auth/login">login</a><br>
+        <a href="/auth/register">register</a>
+    </div>
 
     <hr/>
 

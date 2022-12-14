@@ -6,7 +6,7 @@
 </head>
 <body>
 
-    chat with <a th:href="@{/users/{id}(id=${companion.getId()})}" th:text="${companion.getName()}" /></br>
+    in chat with <a th:href="@{/users/{id}(id=${companion.getId()})}" th:text="${companion.getName()}" /></br>
     <a th:href="@{/users/{id}(id=${user.getId()})}">back to profile</a>
 
     <hr/>
