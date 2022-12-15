@@ -48,6 +48,16 @@ public class User {
     public User(String name, LocalDate birthDay) {
         this.name = name;
         this.birthDay = birthDay;
+        this.login = name;
+        this.password = "";
+    }
+
+    /** for tests */
+    public User(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+        this.login = name;
+        this.password = "";
     }
 
     public List<User> getFriends() {

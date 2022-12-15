@@ -27,8 +27,14 @@ public class MessageDAO implements DAO<Message> {
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
 
-            User sender = session.get(User.class, message.getSender().getId());
-            User receiver = session.get(User.class, message.getReceiver().getId());
+            User sender = message.getSender();
+            User receiver = message.getReceiver();
+
+            if (sender.getId() != null)
+                sender = session.get(User.class, sender.getId());
+
+            if (receiver.getId() != null)
+                receiver = session.get(User.class, receiver.getId());
 
             messagePersisted = new Message(sender, receiver, message.getText());
             session.persist(messagePersisted);
@@ -45,9 +51,7 @@ public class MessageDAO implements DAO<Message> {
         Message message;
 
         try (Session session = sessionFactory.openSession()) {
-            session.getTransaction().begin();
             message = session.get(Message.class, id);
-            session.getTransaction().commit();
         }
 
         return message;
@@ -59,9 +63,7 @@ public class MessageDAO implements DAO<Message> {
         List<Message> messages;
 
         try (Session session = sessionFactory.openSession()) {
-            session.getTransaction().begin();
             messages = session.createQuery("select message from Message message", Message.class).list();
-            session.getTransaction().commit();
         }
 
         return messages;
@@ -103,15 +105,12 @@ public class MessageDAO implements DAO<Message> {
         List<Message> messages;
 
         try (Session session = sessionFactory.openSession()) {
-            session.getTransaction().begin();
 
             Query query = session.createQuery("from Message m where (m.sender = ?1 AND m.receiver = ?2) OR (m.sender = ?2 AND m.receiver = ?1)");
             query.setParameter(1, user1);
             query.setParameter(2, user2);
 
             messages = query.getResultList();
-
-            session.getTransaction().commit();
         }
 
         Collections.sort(messages);

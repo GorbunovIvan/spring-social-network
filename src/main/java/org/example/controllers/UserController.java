@@ -70,7 +70,7 @@ public class UserController {
             return "redirect:/auth/login";
 
         model.addAttribute("user", userDAO.getCurrentUser(currentUserId));
-        return "/users/edit";
+        return "users/edit";
     }
 
     @PostMapping("/update")

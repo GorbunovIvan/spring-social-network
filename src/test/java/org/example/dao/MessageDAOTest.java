@@ -6,32 +6,41 @@ import org.example.models.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Component
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {SpringConfig.class})
+@WebAppConfiguration
 class MessageDAOTest {
 
-    private AnnotationConfigApplicationContext context;
     private DAO<Message> messageDAO;
     private final User sender = new User("userForMessageSending", LocalDate.now());
     private final User receiver = new User("userForMessageReceiving", LocalDate.now());
 
-    @BeforeEach
-    void setUp() {
-        var context = new AnnotationConfigApplicationContext(SpringConfig.class);
-        messageDAO = context.getBean(MessageDAO.class);
-    }
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+    private MockMvc mockMvc;
 
-    @AfterEach
-    void tearDown() {
-        if (context != null)
-            context.close();
+    @BeforeEach
+    public void setup() {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+        messageDAO = mockMvc.getDispatcherServlet()
+                .getWebApplicationContext()
+                .getBean(MessageDAO.class);
     }
 
     @Test

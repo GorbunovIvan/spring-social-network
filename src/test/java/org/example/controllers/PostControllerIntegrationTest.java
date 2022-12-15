@@ -1,6 +1,7 @@
 package org.example.controllers;
 
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.Cookie;
 import org.example.config.SpringConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {SpringConfig.class})
 @WebAppConfiguration
@@ -46,9 +48,21 @@ class PostControllerIntegrationTest {
     }
 
     @Test
+    void createNewAuthorized() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/posts/new").cookie(getCookies()))
+                .andExpect(MockMvcResultMatchers.view().name("posts/post"));
+    }
+
+    @Test
     void edit() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/posts/1"))
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/posts/" + testPostId()))
                 .andExpect(MockMvcResultMatchers.view().name("redirect:/auth/login"));
+    }
+
+    @Test
+    void editAuthorized() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/posts/" + testPostId()).cookie(getCookies()))
+                .andExpect(MockMvcResultMatchers.view().name("posts/post"));
     }
 
     @Test
@@ -58,8 +72,32 @@ class PostControllerIntegrationTest {
     }
 
     @Test
+    void createUpdateAuthorized() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/posts").cookie(getCookies()))
+                .andExpect(MockMvcResultMatchers.view().name("redirect:/users/" + testUserId()));
+    }
+
+    @Test
     void delete() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/posts/delete/1"))
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/posts/delete/" + testPostId()))
                 .andExpect(MockMvcResultMatchers.view().name("redirect:/auth/login"));
+    }
+
+    @Test
+    void deleteAuthorized() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/posts/delete/" + testPostId()).cookie(getCookies()))
+                .andExpect(MockMvcResultMatchers.view().name("redirect:/users/" + testUserId()));
+    }
+
+    private Cookie getCookies() {
+        return new Cookie("user-id", testUserId());
+    }
+
+    private String testUserId() {
+        return "142";
+    }
+
+    private String testPostId() {
+        return "19";
     }
 }

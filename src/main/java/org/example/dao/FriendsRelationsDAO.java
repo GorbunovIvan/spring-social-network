@@ -24,8 +24,15 @@ public class FriendsRelationsDAO implements DAO<FriendsRelations> {
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
 
-            User user = session.get(User.class, friendsRelations.getInviter().getId());
-            User friend = session.get(User.class, friendsRelations.getReceiver().getId());
+            User user = friendsRelations.getInviter();
+            User friend = friendsRelations.getReceiver();
+
+            if (user.getId() != null)
+                user = session.get(User.class, user.getId());
+
+            if (friend.getId() != null)
+                friend = session.get(User.class, friend.getId());
+
             friendsRelationsPersisted = new FriendsRelations(user, friend);
 
             session.persist(friendsRelationsPersisted);
@@ -42,9 +49,7 @@ public class FriendsRelationsDAO implements DAO<FriendsRelations> {
         FriendsRelations friendsRelations;
 
         try (Session session = sessionFactory.openSession()) {
-            session.getTransaction().begin();
             friendsRelations = session.get(FriendsRelations.class, id);
-            session.getTransaction().commit();
         }
 
         return friendsRelations;
@@ -56,16 +61,11 @@ public class FriendsRelationsDAO implements DAO<FriendsRelations> {
 
         try (Session session = sessionFactory.openSession()) {
 
-            session.getTransaction().begin();
-
             Query query = session.createNativeQuery("select * from friends_relations f WHERE (f.inviter_id = ?1 AND f.receiver_id = ?2) OR (f.inviter_id = ?2 AND f.receiver_id = ?1)", FriendsRelations.class);
             query.setParameter(1, friend1Id);
             query.setParameter(2, friend2Id);
 
             friendsRelations = (FriendsRelations)query.getSingleResult();
-
-            session.getTransaction().commit();
-
         }
 
         return friendsRelations;
@@ -77,9 +77,7 @@ public class FriendsRelationsDAO implements DAO<FriendsRelations> {
         List<FriendsRelations> friendsRelations;
 
         try (Session session = sessionFactory.openSession()) {
-            session.getTransaction().begin();
             friendsRelations = session.createQuery("select friendsRelations from FriendsRelations friendsRelations", FriendsRelations.class).list();
-            session.getTransaction().commit();
         }
 
         return friendsRelations;

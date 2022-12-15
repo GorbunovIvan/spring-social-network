@@ -1,6 +1,7 @@
 package org.example.controllers;
 
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.Cookie;
 import org.example.config.SpringConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,13 +42,33 @@ class MessageControllerIntegrationTest {
 
     @Test
     void chat() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/chat/1"))
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/chat/2"))
                 .andExpect(MockMvcResultMatchers.view().name("redirect:/auth/login"));
     }
 
     @Test
+    void chatAuthorized() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/chat/2").cookie(getCookies()))
+                .andExpect(MockMvcResultMatchers.view().name("/messages/chat"));
+    }
+
+    @Test
     void createNew() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/chat/createNew/1"))
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/chat/createNew/2"))
                 .andExpect(MockMvcResultMatchers.view().name("redirect:/auth/login"));
+    }
+
+    @Test
+    void createNewAuthorized() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/chat/createNew/2").cookie(getCookies()))
+                .andExpect(MockMvcResultMatchers.view().name("redirect:/chat/2"));
+    }
+
+    private Cookie getCookies() {
+        return new Cookie("user-id", testUserId());
+    }
+
+    private String testUserId() {
+        return "142";
     }
 }

@@ -35,7 +35,15 @@ public class PostController {
         if (!userDAO.isAuthorized(currentUserId))
             return "redirect:/auth/login";
 
-        model.addAttribute("post", postDAO.read(id));
+        Post post = postDAO.read(id);
+
+        if (post == null)
+            return "redirect:/users/" + currentUserId;
+
+        if (!post.getUser().equals(userDAO.getCurrentUser(currentUserId)))
+            return "redirect:/users/" + currentUserId;
+
+        model.addAttribute("post", post);
         return "posts/post";
     }
 
@@ -64,6 +72,9 @@ public class PostController {
             return "redirect:/auth/login";
 
         Post post = postDAO.read(id);
+
+        if (post == null)
+            return "redirect:/users/" + currentUserId;
 
         postDAO.delete(id);
 

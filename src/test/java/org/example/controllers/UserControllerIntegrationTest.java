@@ -1,7 +1,9 @@
 package org.example.controllers;
 
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.Cookie;
 import org.example.config.SpringConfig;
+import org.example.models.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +20,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {SpringConfig.class})
@@ -42,46 +45,79 @@ class UserControllerIntegrationTest {
     }
 
     @Test
-    void showAll() throws Exception {
+    void testShowAll() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/users"))
 //                .andDo(print())
                 .andExpect(MockMvcResultMatchers.view().name("users/all"));
     }
 
     @Test
-    void profile() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/users/1"))
+    void testProfile() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/users/" + testUserId()))
                 .andExpect(MockMvcResultMatchers.view().name("users/profile"));
     }
 
     @Test
-    void friends() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/users/1/friends"))
+    void testFriends() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/users/" + testUserId() + "/friends"))
                 .andExpect(MockMvcResultMatchers.view().name("users/friends"));
     }
 
     @Test
-    void edit() throws Exception {
+    void testEdit() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/users/edit"))
                 .andExpect(MockMvcResultMatchers.view().name("redirect:/auth/login"));
     }
 
     @Test
-    void update() throws Exception {
+    void testEditAuthorized() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/users/edit").cookie(getCookies()))
+                .andExpect(MockMvcResultMatchers.view().name("users/edit"));
+    }
+
+    @Test
+    void testUpdate() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.post("/users/update"))
+                .andExpect(MockMvcResultMatchers.view().name("redirect:/auth/login"));
+    }
+
+    @Test
+    void testUpdateAuthorized() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/users/update").cookie(getCookies()))
                 .andDo(print())
+                .andExpect(jsonPath("$.user").value(new User(1, "test")))
+                .andExpect(MockMvcResultMatchers.view().name("redirect:/users/1"));
+    }
+
+    @Test
+    void testAddToFriends() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/users/addToFriends/2"))
                 .andExpect(MockMvcResultMatchers.view().name("redirect:/auth/login"));
     }
 
     @Test
-    void addToFriends() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/users/addToFriends/1"))
+    void testAddToFriendsAuthorized() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/users/addToFriends/2").cookie(getCookies()))
+                .andExpect(MockMvcResultMatchers.view().name("redirect:/users/2"));
+    }
+
+    @Test
+    void testDeleteFromFriends() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/users/deleteFromFriends/2"))
                 .andExpect(MockMvcResultMatchers.view().name("redirect:/auth/login"));
     }
 
     @Test
-    void deleteFromFriends() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/users/deleteFromFriends/1"))
-                .andExpect(MockMvcResultMatchers.view().name("redirect:/auth/login"));
+    void testDeleteFromFriendsAuthorized() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/users/deleteFromFriends/2").cookie(getCookies()))
+                .andExpect(MockMvcResultMatchers.view().name("redirect:/users/2"));
+    }
+
+    private Cookie getCookies() {
+        return new Cookie("user-id", testUserId());
+    }
+
+    private String testUserId() {
+        return "142";
     }
 }

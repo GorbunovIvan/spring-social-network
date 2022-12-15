@@ -26,8 +26,16 @@ public class PostDAO implements DAO<Post> {
 
         try (Session session = sessionFactory.openSession()) {
             session.getTransaction().begin();
-            post.setUser(session.get(User.class, post.getUser().getId()));
+
+            User user = post.getUser();
+
+            if (user.getId() != null)
+                user = session.get(User.class, post.getUser().getId());
+
+            post.setUser(user);
+
             session.persist(post);
+
             session.getTransaction().commit();
         }
 
@@ -40,9 +48,7 @@ public class PostDAO implements DAO<Post> {
         Post post;
 
         try (Session session = sessionFactory.openSession()) {
-            session.getTransaction().begin();
             post = session.get(Post.class, id);
-            session.getTransaction().commit();
         }
 
         return post;
@@ -54,9 +60,7 @@ public class PostDAO implements DAO<Post> {
         List<Post> posts;
 
         try (Session session = sessionFactory.openSession()) {
-            session.getTransaction().begin();
             posts = session.createQuery("select post from Post post", Post.class).list();
-            session.getTransaction().commit();
         }
 
         return posts;
